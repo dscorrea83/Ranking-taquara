@@ -32,7 +32,7 @@
     line-height:1.6;
   }
 
-  /* ===== HEADER (identidade do blog: preto + pontos) ===== */
+  /* ===== HEADER ===== */
   header {
     background:var(--preto);
     color:var(--branco);
@@ -426,27 +426,27 @@
 </footer>
 
 <script>
-// ===== DADOS =====
+// ===== DADOS (com nomes exatos dos arquivos de foto) =====
 const vereadores = [
-  { nome:"Mônica", partido:"PT", bloco:"Oposicao", foto:"Mnica-Facio.png", total2025:591.5, total2026:81.5, total18m:673, categorias:{"Presença":48,"Indicações/PPs":93,"PIs":10.5,"PDLs":2,"PLs Relevantes":100,"PLs Simbólicas":2,"PELOs":20,"Emendas":136,"Substitutivos":16,"Reuniões":46,"Debates":70,"Req. Audiência":5,"Part. Audiências":14,"Presidir Frente":10,"Membro Frente":10,"Reuniões Frentes":9} },
+  { nome:"Mônica", partido:"PT", bloco:"Oposicao", foto:"Mônica-Facio.png", total2025:591.5, total2026:81.5, total18m:673, categorias:{"Presença":48,"Indicações/PPs":93,"PIs":10.5,"PDLs":2,"PLs Relevantes":100,"PLs Simbólicas":2,"PELOs":20,"Emendas":136,"Substitutivos":16,"Reuniões":46,"Debates":70,"Req. Audiência":5,"Part. Audiências":14,"Presidir Frente":10,"Membro Frente":10,"Reuniões Frentes":9} },
   { nome:"Gustavo Luz", partido:"PP", bloco:"Oposicao", foto:"Gustavo-Luz.jpg", total2025:419.5, total2026:119.5, total18m:539, categorias:{"Presença":46,"Indicações/PPs":0,"PIs":10.5,"PDLs":0,"PLs Relevantes":40,"PLs Simbólicas":0,"PELOs":20,"Emendas":200,"Substitutivos":0,"Reuniões":3,"Debates":74,"Req. Audiência":0,"Part. Audiências":16,"Presidir Frente":0,"Membro Frente":10,"Reuniões Frentes":0} },
   { nome:"Fabi Reinaldo", partido:"Republicanos", bloco:"Oposicao", foto:"Fabi-Reinaldo.png", total2025:319, total2026:148.5, total18m:467.5, categorias:{"Presença":50,"Indicações/PPs":142.5,"PIs":19.5,"PDLs":2,"PLs Relevantes":0,"PLs Simbólicas":0,"PELOs":20,"Emendas":24,"Substitutivos":0,"Reuniões":9,"Debates":23,"Req. Audiência":0,"Part. Audiências":14,"Presidir Frente":0,"Membro Frente":15,"Reuniões Frentes":0} },
   { nome:"Telmo Vieira", partido:"PP", bloco:"Situacao", foto:"Temo-Vieira.png", total2025:331, total2026:97, total18m:428, categorias:{"Presença":50,"Indicações/PPs":46.5,"PIs":4.5,"PDLs":2,"PLs Relevantes":60,"PLs Simbólicas":12,"PELOs":40,"Emendas":40,"Substitutivos":0,"Reuniões":9,"Debates":23,"Req. Audiência":5,"Part. Audiências":16,"Presidir Frente":10,"Membro Frente":10,"Reuniões Frentes":3} },
-  { nome:"Guido Mario", partido:"PP", bloco:"Situacao", foto:"Guido-Mrio.png", total2025:360, total2026:61.5, total18m:421.5, categorias:{"Presença":48,"Indicações/PPs":42,"PIs":0,"PDLs":2,"PLs Relevantes":40,"PLs Simbólicas":2,"PELOs":20,"Emendas":64,"Substitutivos":0,"Reuniões":17,"Debates":104,"Req. Audiência":0,"Part. Audiências":16,"Presidir Frente":0,"Membro Frente":5,"Reuniões Frentes":0} },
+  { nome:"Guido Mario", partido:"PP", bloco:"Situacao", foto:"Guido-Mário.png", total2025:360, total2026:61.5, total18m:421.5, categorias:{"Presença":48,"Indicações/PPs":42,"PIs":0,"PDLs":2,"PLs Relevantes":40,"PLs Simbólicas":2,"PELOs":20,"Emendas":64,"Substitutivos":0,"Reuniões":17,"Debates":104,"Req. Audiência":0,"Part. Audiências":16,"Presidir Frente":0,"Membro Frente":5,"Reuniões Frentes":0} },
   { nome:"Jorginho", partido:"Republicanos", bloco:"Situacao", foto:"Jorge.png", total2025:261, total2026:117.5, total18m:378.5, categorias:{"Presença":52,"Indicações/PPs":151.5,"PIs":1.5,"PDLs":2,"PLs Relevantes":0,"PLs Simbólicas":2,"PELOs":20,"Emendas":0,"Substitutivos":0,"Reuniões":3,"Debates":18,"Req. Audiência":0,"Part. Audiências":6,"Presidir Frente":0,"Membro Frente":5,"Reuniões Frentes":0} },
   { nome:"Everton", partido:"PP", bloco:"Situacao", foto:"Everton.png", total2025:193.5, total2026:62, total18m:255.5, categorias:{"Presença":48,"Indicações/PPs":58.5,"PIs":0,"PDLs":2,"PLs Relevantes":20,"PLs Simbólicas":0,"PELOs":20,"Emendas":0,"Substitutivos":0,"Reuniões":6,"Debates":5,"Req. Audiência":0,"Part. Audiências":24,"Presidir Frente":0,"Membro Frente":10,"Reuniões Frentes":0} },
   { nome:"Beto Lemos", partido:"PSB", bloco:"Situacao", foto:"Beto-Lemos.png", total2025:186.5, total2026:56, total18m:242.5, categorias:{"Presença":44,"Indicações/PPs":87,"PIs":1.5,"PDLs":2,"PLs Relevantes":0,"PLs Simbólicas":0,"PELOs":0,"Emendas":8,"Substitutivos":0,"Reuniões":11,"Debates":19,"Req. Audiência":0,"Part. Audiências":4,"Presidir Frente":0,"Membro Frente":10,"Reuniões Frentes":0} },
   { nome:"Magali", partido:"Uniao", bloco:"Oposicao", foto:"Magali.png", total2025:176, total2026:53, total18m:229, categorias:{"Presença":46,"Indicações/PPs":3,"PIs":3,"PDLs":2,"PLs Relevantes":40,"PLs Simbólicas":0,"PELOs":20,"Emendas":16,"Substitutivos":0,"Reuniões":9,"Debates":28,"Req. Audiência":0,"Part. Audiências":4,"Presidir Frente":0,"Membro Frente":5,"Reuniões Frentes":0} },
-  { nome:"Elias da Enfermagem", partido:"Republicanos", bloco:"Situacao", foto:"elias-da-Enfermagem.png", total2025:179, total2026:49, total18m:228, categorias:{"Presença":52,"Indicações/PPs":94.5,"PIs":1.5,"PDLs":0,"PLs Relevantes":20,"PLs Simbólicas":2,"PELOs":0,"Emendas":0,"Substitutivos":0,"Reuniões":3,"Debates":6,"Req. Audiência":0,"Part. Audiências":0,"Presidir Frente":0,"Membro Frente":0,"Reuniões Frentes":0} },
-  { nome:"Dodô Mello", partido:"Republicanos", bloco:"Situacao", foto:"Dod-Melo.png", total2025:152.5, total2026:50, total18m:202.5, categorias:{"Presença":52,"Indicações/PPs":42,"PIs":1.5,"PDLs":2,"PLs Relevantes":0,"PLs Simbólicas":0,"PELOs":20,"Emendas":8,"Substitutivos":0,"Reuniões":6,"Debates":0,"Req. Audiência":0,"Part. Audiências":16,"Presidir Frente":0,"Membro Frente":5,"Reuniões Frentes":0} },
+  { nome:"Elias da Enfermagem", partido:"Republicanos", bloco:"Situacao", foto:"Elias-da-Enfermagem.png", total2025:179, total2026:49, total18m:228, categorias:{"Presença":52,"Indicações/PPs":94.5,"PIs":1.5,"PDLs":0,"PLs Relevantes":20,"PLs Simbólicas":2,"PELOs":0,"Emendas":0,"Substitutivos":0,"Reuniões":3,"Debates":6,"Req. Audiência":0,"Part. Audiências":0,"Presidir Frente":0,"Membro Frente":0,"Reuniões Frentes":0} },
+  { nome:"Dodô Mello", partido:"Republicanos", bloco:"Situacao", foto:"Dodô-Melo.png", total2025:152.5, total2026:50, total18m:202.5, categorias:{"Presença":52,"Indicações/PPs":42,"PIs":1.5,"PDLs":2,"PLs Relevantes":0,"PLs Simbólicas":0,"PELOs":20,"Emendas":8,"Substitutivos":0,"Reuniões":6,"Debates":0,"Req. Audiência":0,"Part. Audiências":16,"Presidir Frente":0,"Membro Frente":5,"Reuniões Frentes":0} },
   { nome:"Lissandro", partido:"MDB", bloco:"Situacao", foto:"Lisandro-Neni.png", total2025:145, total2026:48.5, total18m:193.5, categorias:{"Presença":50,"Indicações/PPs":36,"PIs":3,"PDLs":2,"PLs Relevantes":20,"PLs Simbólicas":0,"PELOs":20,"Emendas":0,"Substitutivos":0,"Reuniões":3,"Debates":0,"Req. Audiência":0,"Part. Audiências":6,"Presidir Frente":0,"Membro Frente":5,"Reuniões Frentes":0} },
   { nome:"Carmem Fontoura", partido:"PSB", bloco:"Situacao", foto:"Carmem-Fontoura.png", total2025:121, total2026:64, total18m:185, categorias:{"Presença":50,"Indicações/PPs":6,"PIs":0,"PDLs":2,"PLs Relevantes":0,"PLs Simbólicas":0,"PELOs":20,"Emendas":0,"Substitutivos":0,"Reuniões":9,"Debates":18,"Req. Audiência":0,"Part. Audiências":6,"Presidir Frente":0,"Membro Frente":10,"Reuniões Frentes":0} },
   { nome:"Jaimara", partido:"PL", bloco:"Situacao", foto:"Jaimara.png", total2025:139, total2026:36, total18m:175, categorias:{"Presença":32,"Indicações/PPs":12,"PIs":0,"PDLs":2,"PLs Relevantes":20,"PLs Simbólicas":0,"PELOs":40,"Emendas":0,"Substitutivos":0,"Reuniões":11,"Debates":13,"Req. Audiência":0,"Part. Audiências":4,"Presidir Frente":0,"Membro Frente":5,"Reuniões Frentes":0} },
-  { nome:"Enf. Jorge Amaral", partido:"PDT", bloco:"Situacao", foto:"Jorge-Amaral.jpeg", total2025:59, total2026:63, total18m:122, categorias:{"Presença":52,"Indicações/PPs":0,"PIs":0,"PDLs":2,"PLs Relevantes":0,"PLs Simbólicas":0,"PELOs":0,"Emendas":0,"Substitutivos":0,"Reuniões":0,"Debates":0,"Req. Audiência":0,"Part. Audiências":0,"Presidir Frente":0,"Membro Frente":5,"Reuniões Frentes":0} },
-  { nome:"Junior Eltz", partido:"PDT", bloco:"Situacao", foto:"", total2025:69, total2026:0, total18m:69, categorias:{"Presença":0,"Indicações/PPs":36,"PIs":0,"PDLs":0,"PLs Relevantes":20,"PLs Simbólicas":0,"PELOs":0,"Emendas":0,"Substitutivos":0,"Reuniões":3,"Debates":8,"Req. Audiência":0,"Part. Audiências":2,"Presidir Frente":0,"Membro Frente":0,"Reuniões Frentes":0} },
-  { nome:"Sirlene Kaiper", partido:"PP", bloco:"Situacao", foto:"", total2025:32, total2026:0, total18m:32, categorias:{"Presença":0,"Indicações/PPs":12,"PIs":0,"PDLs":0,"PLs Relevantes":20,"PLs Simbólicas":0,"PELOs":0,"Emendas":0,"Substitutivos":0,"Reuniões":0,"Debates":0,"Req. Audiência":0,"Part. Audiências":0,"Presidir Frente":0,"Membro Frente":0,"Reuniões Frentes":0} },
-  { nome:"Pedrinho Teixeira", partido:"PT", bloco:"Situacao", foto:"", total2025:21.5, total2026:0, total18m:21.5, categorias:{"Presença":0,"Indicações/PPs":7.5,"PIs":0,"PDLs":0,"PLs Relevantes":0,"PLs Simbólicas":2,"PELOs":0,"Emendas":8,"Substitutivos":0,"Reuniões":0,"Debates":2,"Req. Audiência":0,"Part. Audiências":2,"Presidir Frente":0,"Membro Frente":0,"Reuniões Frentes":0} },
-  { nome:"Adalberto Soares", partido:"PP", bloco:"Situacao", foto:"", total2025:12, total2026:0, total18m:12, categorias:{"Presença":0,"Indicações/PPs":9,"PIs":0,"PDLs":0,"PLs Relevantes":0,"PLs Simbólicas":0,"PELOs":0,"Emendas":0,"Substitutivos":0,"Reuniões":3,"Debates":0,"Req. Audiência":0,"Part. Audiências":0,"Presidir Frente":0,"Membro Frente":0,"Reuniões Frentes":0} }
+  { nome:"Enf. Jorge Amaral", partido:"PDT", bloco:"Situacao", foto:"Jorge-Amaral.png", total2025:59, total2026:63, total18m:122, categorias:{"Presença":52,"Indicações/PPs":0,"PIs":0,"PDLs":2,"PLs Relevantes":0,"PLs Simbólicas":0,"PELOs":0,"Emendas":0,"Substitutivos":0,"Reuniões":0,"Debates":0,"Req. Audiência":0,"Part. Audiências":0,"Presidir Frente":0,"Membro Frente":5,"Reuniões Frentes":0} },
+  { nome:"Junior Eltz", partido:"PDT", bloco:"Situacao", foto:"Junior-Eltz.png", total2025:69, total2026:0, total18m:69, categorias:{"Presença":0,"Indicações/PPs":36,"PIs":0,"PDLs":0,"PLs Relevantes":20,"PLs Simbólicas":0,"PELOs":0,"Emendas":0,"Substitutivos":0,"Reuniões":3,"Debates":8,"Req. Audiência":0,"Part. Audiências":2,"Presidir Frente":0,"Membro Frente":0,"Reuniões Frentes":0} },
+  { nome:"Sirlene Kaiper", partido:"PP", bloco:"Situacao", foto:"Sirlei-Kaiper.png", total2025:32, total2026:0, total18m:32, categorias:{"Presença":0,"Indicações/PPs":12,"PIs":0,"PDLs":0,"PLs Relevantes":20,"PLs Simbólicas":0,"PELOs":0,"Emendas":0,"Substitutivos":0,"Reuniões":0,"Debates":0,"Req. Audiência":0,"Part. Audiências":0,"Presidir Frente":0,"Membro Frente":0,"Reuniões Frentes":0} },
+  { nome:"Pedrinho Teixeira", partido:"PT", bloco:"Situacao", foto:"Pedrinho-Teixeira.png", total2025:21.5, total2026:0, total18m:21.5, categorias:{"Presença":0,"Indicações/PPs":7.5,"PIs":0,"PDLs":0,"PLs Relevantes":0,"PLs Simbólicas":2,"PELOs":0,"Emendas":8,"Substitutivos":0,"Reuniões":0,"Debates":2,"Req. Audiência":0,"Part. Audiências":2,"Presidir Frente":0,"Membro Frente":0,"Reuniões Frentes":0} },
+  { nome:"Adalberto Soares", partido:"PP", bloco:"Situacao", foto:"Adalberto-Soares.png", total2025:12, total2026:0, total18m:12, categorias:{"Presença":0,"Indicações/PPs":9,"PIs":0,"PDLs":0,"PLs Relevantes":0,"PLs Simbólicas":0,"PELOs":0,"Emendas":0,"Substitutivos":0,"Reuniões":3,"Debates":0,"Req. Audiência":0,"Part. Audiências":0,"Presidir Frente":0,"Membro Frente":0,"Reuniões Frentes":0} }
 ];
 
 // ===== ESTADO =====
@@ -597,7 +597,6 @@ function renderComparativo() {
 function renderGraficos() {
   const ordenados = [...vereadores].sort((a,b)=>b.total18m-a.total18m);
 
-  // Ranking 18 meses
   const ctx1 = document.getElementById('chart-ranking').getContext('2d');
   if(charts.ranking) charts.ranking.destroy();
   charts.ranking = new Chart(ctx1, {
@@ -613,7 +612,6 @@ function renderGraficos() {
     }
   });
 
-  // Categorias (soma)
   const cats = ["Presença","Indicações/PPs","PIs","PDLs","PLs Relevantes","PLs Simbólicas","PELOs","Emendas","Substitutivos","Reuniões","Debates","Req. Audiência","Part. Audiências","Presidir Frente","Membro Frente","Reuniões Frentes"];
   const somaCat = cats.map(c=>vereadores.reduce((s,v)=>s+(v.categorias[c]||0),0));
   const ctx2 = document.getElementById('chart-categorias').getContext('2d');
@@ -626,7 +624,6 @@ function renderGraficos() {
     }
   });
 
-  // Pizza por bloco
   const somaOpos = vereadores.filter(v=>v.bloco==='Oposicao').reduce((s,v)=>s+v.total18m,0);
   const somaSit = vereadores.filter(v=>v.bloco==='Situacao').reduce((s,v)=>s+v.total18m,0);
   const ctx3 = document.getElementById('chart-bloco').getContext('2d');
@@ -643,7 +640,6 @@ function renderGraficos() {
     }
   });
 
-  // Comparativo
   const ctx4 = document.getElementById('chart-comparativo').getContext('2d');
   if(charts.comparativo) charts.comparativo.destroy();
   charts.comparativo = new Chart(ctx4, {
@@ -657,7 +653,6 @@ function renderGraficos() {
     }
   });
 
-  // Evolução (Top 5 + média)
   const top5 = ordenados.slice(0,5);
   const media2025 = (vereadores.reduce((s,v)=>s+v.total2025,0)/vereadores.length).toFixed(1);
   const media2026 = (vereadores.reduce((s,v)=>s+v.total2026,0)/vereadores.length).toFixed(1);

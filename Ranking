@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel de Atuação Parlamentar — Taquara em Foco</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --preto: #0A0A0A;
+    --azul-escuro: #16233C;
+    --azul-ardosia: #5B7A9D;
+    --azul-ardosia-claro: #7A96B8;
+    --azul-ardosia-fundo: #E8EDF3;
+    --branco: #FFFFFF;
+    --cinza-claro: #D3D3D3;
+    --cinza-medio: #9CA3AF;
+    --cinza-texto: #4B5563;
+    --cinza-fundo: #F4F5F7;
+    --verde: #16a34a;
+    --vermelho: #dc2626;
+    --sombra: 0 4px 20px rgba(10,10,10,0.08);
+    --sombra-hover: 0 8px 30px rgba(10,10,10,0.14);
+    --raio: 14px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body {
+    font-family:'Segoe UI', system-ui, -apple-system, sans-serif;
+    background:var(--cinza-fundo);
+    color:var(--cinza-texto);
+    line-height:1.6;
+  }
+
+  /* ===== HEADER (identidade do blog: preto + pontos) ===== */
+  header {
+    background:var(--preto);
+    color:var(--branco);
+    padding:2.5rem 1rem 2rem;
+    text-align:center;
+    position:relative;
+    overflow:hidden;
+  }
+  header::before {
+    content:'';
+    position:absolute;
+    top:50%; left:50%;
+    transform:translate(-50%,-50%);
+    width:600px; height:600px;
+    background:
+      radial-gradient(circle, rgba(211,211,211,0.5) 2px, transparent 2.5px),
+      radial-gradient(circle, rgba(211,211,211,0.3) 2px, transparent 2.5px);
+    background-size:40px 40px, 25px 25px;
+    background-position:0 0, 12px 12px;
+    opacity:0.25;
+    border-radius:50%;
+    pointer-events:none;
+  }
+  .header-badge {
+    display:inline-block;
+    background:var(--azul-ardosia);
+    border:1px solid rgba(255,255,255,0.25);
+    padding:0.3rem 1rem;
+    border-radius:30px;
+    font-size:0.75rem;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    margin-bottom:1rem;
+    position:relative; z-index:1;
+  }
+  header h1 {
+    font-size:clamp(1.5rem, 4vw, 2.4rem);
+    font-weight:700;
+    margin-bottom:0.4rem;
+    position:relative; z-index:1;
+  }
+  header p { opacity:0.92; max-width:760px; margin:0 auto; position:relative; z-index:1; }
+  .header-sub { font-size:0.85rem; opacity:0.7; margin-top:0.6rem; position:relative; z-index:1; }
+
+  /* ===== CONTAINER ===== */
+  .container { max-width:1240px; margin:0 auto; padding:1.5rem 1rem 3rem; }
+
+  /* ===== KPIs ===== */
+  .kpi-grid {
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(160px, 1fr));
+    gap:1rem;
+    margin-bottom:1.5rem;
+  }
+  .kpi-card {
+    background:var(--branco);
+    border-radius:var(--raio);
+    padding:1.2rem;
+    box-shadow:var(--sombra);
+    text-align:center;
+    border-top:4px solid var(--azul-ardosia);
+    transition:transform 0.2s, box-shadow 0.2s;
+  }
+  .kpi-card:hover { transform:translateY(-3px); box-shadow:var(--sombra-hover); }
+  .kpi-card .kpi-icon { font-size:1.6rem; margin-bottom:0.3rem; }
+  .kpi-card .kpi-value { font-size:1.8rem; font-weight:700; color:var(--azul-escuro); }
+  .kpi-card .kpi-label { font-size:0.8rem; color:var(--cinza-medio); text-transform:uppercase; letter-spacing:0.5px; }
+  .kpi-card.destaque { border-top-color:var(--azul-escuro); }
+  .kpi-card.destaque .kpi-value { color:var(--azul-escuro); }
+
+  /* ===== TABS ===== */
+  .tabs {
+    display:flex; gap:0.4rem; margin-bottom:1.5rem;
+    flex-wrap:wrap; background:var(--branco);
+    padding:0.5rem; border-radius:12px; box-shadow:var(--sombra);
+  }
+  .tab-btn {
+    padding:0.6rem 1.1rem; border:none; border-radius:8px;
+    background:transparent; color:var(--azul-escuro);
+    font-weight:600; cursor:pointer; transition:all 0.2s;
+    font-size:0.9rem; display:flex; align-items:center; gap:0.4rem;
+  }
+  .tab-btn:hover { background:var(--azul-ardosia-fundo); }
+  .tab-btn.active { background:var(--azul-escuro); color:var(--branco); box-shadow:0 2px 8px rgba(22,35,60,0.3); }
+
+  .tab-content { display:none; animation:fadeIn 0.3s ease; }
+  .tab-content.active { display:block; }
+  @keyframes fadeIn { from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);} }
+
+  /* ===== CARDS ===== */
+  .card {
+    background:var(--branco);
+    border-radius:var(--raio);
+    padding:1.5rem;
+    box-shadow:var(--sombra);
+    margin-bottom:1.5rem;
+  }
+  .card h2 {
+    color:var(--azul-escuro); margin-bottom:1rem;
+    font-size:1.2rem; display:flex; align-items:center; gap:0.5rem;
+  }
+  .card h2 .icon { font-size:1.3rem; }
+
+  /* ===== BUSCA ===== */
+  .search-box { position:relative; margin-bottom:1.2rem; }
+  .search-box input {
+    width:100%; padding:0.8rem 1rem 0.8rem 2.8rem;
+    border:2px solid var(--cinza-claro); border-radius:10px;
+    font-size:1rem; transition:border-color 0.2s;
+    background:var(--branco);
+  }
+  .search-box input:focus { outline:none; border-color:var(--azul-ardosia); }
+  .search-box .search-icon {
+    position:absolute; left:1rem; top:50%; transform:translateY(-50%);
+    color:var(--cinza-medio); font-size:1.1rem;
+  }
+
+  /* ===== FILTROS ===== */
+  .filters { display:flex; gap:0.5rem; margin-bottom:1rem; flex-wrap:wrap; }
+  .filter-btn {
+    padding:0.4rem 0.9rem; border:1.5px solid var(--azul-ardosia);
+    border-radius:30px; background:var(--branco); color:var(--azul-escuro);
+    cursor:pointer; font-size:0.85rem; font-weight:500;
+    transition:all 0.2s;
+  }
+  .filter-btn:hover { background:var(--azul-ardosia-fundo); }
+  .filter-btn.active { background:var(--azul-escuro); color:var(--branco); border-color:var(--azul-escuro); }
+
+  /* ===== TOGGLE PERÍODO ===== */
+  .period-toggle {
+    display:inline-flex; background:var(--cinza-fundo);
+    border-radius:8px; padding:0.25rem; margin-bottom:1rem;
+  }
+  .period-toggle button {
+    padding:0.4rem 1rem; border:none; border-radius:6px;
+    background:transparent; color:var(--cinza-texto);
+    font-weight:600; font-size:0.85rem; cursor:pointer; transition:all 0.2s;
+  }
+  .period-toggle button.active { background:var(--azul-ardosia); color:var(--branco); }
+
+  /* ===== RANKING ===== */
+  .ranking-item {
+    display:flex; align-items:center; gap:1rem;
+    padding:0.9rem; border-bottom:1px solid var(--cinza-claro);
+    cursor:pointer; transition:background 0.2s, transform 0.2s;
+    border-radius:8px;
+  }
+  .ranking-item:hover { background:var(--azul-ardosia-fundo); transform:translateX(4px); }
+  .ranking-item:last-child { border-bottom:none; }
+  .posicao {
+    width:42px; height:42px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-weight:700; color:var(--branco); flex-shrink:0;
+    font-size:1.05rem;
+  }
+  .pos-1 { background:var(--azul-escuro); box-shadow:0 2px 8px rgba(22,35,60,0.4); }
+  .pos-2 { background:var(--azul-ardosia); }
+  .pos-3 { background:var(--cinza-medio); }
+  .pos-outro { background:var(--azul-ardosia-claro); }
+  .foto {
+    width:52px; height:52px; border-radius:50%;
+    object-fit:cover; border:2.5px solid var(--azul-ardosia-fundo);
+    flex-shrink:0; background:var(--azul-ardosia-fundo);
+  }
+  .info { flex:1; min-width:0; }
+  .info .nome { font-weight:600; color:var(--azul-escuro); }
+  .info .partido { color:var(--cinza-medio); font-size:0.82rem; }
+  .pontos { font-weight:700; color:var(--azul-escuro); font-size:1.1rem; white-space:nowrap; }
+  .medalha { font-size:1.2rem; }
+
+  /* ===== PERFIL ===== */
+  .profile-header {
+    display:flex; align-items:center; gap:1.8rem;
+    margin-bottom:1.5rem; flex-wrap:wrap;
+    background:linear-gradient(135deg, var(--azul-ardosia-fundo), var(--branco));
+    padding:1.5rem; border-radius:var(--raio);
+  }
+  .profile-foto {
+    width:130px; height:130px; border-radius:50%;
+    object-fit:cover; border:4px solid var(--azul-ardosia);
+    box-shadow:0 4px 15px rgba(22,35,60,0.2);
+  }
+  .profile-info h2 { font-size:1.7rem; color:var(--azul-escuro); margin-bottom:0.2rem; }
+  .profile-info .partido { color:var(--cinza-medio); margin-bottom:0.4rem; }
+  .profile-info .total { font-size:2.2rem; font-weight:700; color:var(--azul-escuro); }
+  .profile-info .sub { color:var(--cinza-medio); font-size:0.9rem; }
+  .badge-pos {
+    display:inline-block; padding:0.3rem 0.8rem; border-radius:20px;
+    font-weight:600; font-size:0.85rem; margin-top:0.4rem;
+  }
+  .badge-pos.top { background:var(--azul-escuro); color:var(--branco); }
+  .badge-pos.mid { background:var(--azul-ardosia); color:var(--branco); }
+  .badge-pos.low { background:var(--cinza-claro); color:var(--cinza-texto); }
+
+  .categoria-grid {
+    display:grid; grid-template-columns:repeat(auto-fill, minmax(150px, 1fr));
+    gap:0.8rem; margin-top:1rem;
+  }
+  .categoria-item {
+    background:var(--cinza-fundo); border-radius:10px;
+    padding:0.9rem; text-align:center; transition:transform 0.2s;
+  }
+  .categoria-item:hover { transform:scale(1.03); }
+  .categoria-item .valor { font-size:1.4rem; font-weight:700; color:var(--azul-escuro); }
+  .categoria-item .label { font-size:0.75rem; color:var(--cinza-medio); }
+
+  /* ===== TABELAS ===== */
+  .comparison-table { width:100%; border-collapse:collapse; }
+  .comparison-table th, .comparison-table td {
+    padding:0.7rem; text-align:left; border-bottom:1px solid var(--cinza-claro);
+  }
+  .comparison-table th { background:var(--azul-escuro); color:var(--branco); font-size:0.85rem; }
+  .comparison-table tr:hover { background:var(--azul-ardosia-fundo); }
+  .comparison-table td { font-size:0.9rem; }
+
+  /* ===== GRÁFICOS ===== */
+  .chart-container { position:relative; height:380px; margin-top:0.5rem; }
+  .chart-container.small { height:300px; }
+  .chart-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; }
+  @media (max-width:900px){ .chart-grid{grid-template-columns:1fr;} }
+
+  /* ===== AÇÕES ===== */
+  .action-bar { display:flex; gap:0.6rem; flex-wrap:wrap; margin-bottom:1.5rem; }
+  .action-btn {
+    display:inline-flex; align-items:center; gap:0.5rem;
+    padding:0.6rem 1.1rem; border:none; border-radius:8px;
+    font-weight:600; font-size:0.88rem; cursor:pointer;
+    transition:all 0.2s; text-decoration:none;
+  }
+  .action-btn:hover { transform:translateY(-2px); box-shadow:var(--sombra); }
+  .btn-share { background:var(--azul-escuro); color:var(--branco); }
+  .btn-whatsapp { background:#25D366; color:var(--branco); }
+  .btn-pdf { background:var(--vermelho); color:var(--branco); }
+  .btn-csv { background:var(--verde); color:var(--branco); }
+
+  /* ===== FOOTER ===== */
+  footer {
+    text-align:center; padding:2rem 1rem;
+    color:var(--cinza-medio); font-size:0.85rem;
+    border-top:1px solid var(--cinza-claro);
+    background:var(--preto); color:rgba(255,255,255,0.7);
+  }
+
+  /* ===== RESPONSIVO ===== */
+  @media (max-width:768px) {
+    header { padding:2rem 1rem 1.5rem; }
+    .kpi-grid { grid-template-columns:repeat(2, 1fr); }
+    .profile-header { flex-direction:column; text-align:center; }
+    .ranking-item { gap:0.7rem; }
+    .posicao { width:36px; height:36px; font-size:0.9rem; }
+    .foto { width:44px; height:44px; }
+    .pontos { font-size:0.95rem; }
+    .comparison-table { font-size:0.8rem; }
+    .comparison-table th, .comparison-table td { padding:0.5rem; }
+    .chart-container { height:300px; }
+  }
+  @media (max-width:480px) {
+    .kpi-grid { grid-template-columns:1fr 1fr; gap:0.6rem; }
+    .kpi-card { padding:0.9rem; }
+    .kpi-card .kpi-value { font-size:1.4rem; }
+    .tab-btn { font-size:0.8rem; padding:0.5rem 0.8rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-badge">Taquara em Foco · Transparência Cidadã</div>
+  <h1>🏛️ Painel de Atuação Parlamentar</h1>
+  <p>Câmara Municipal de Taquara/RS — 2025 e 1º semestre de 2026</p>
+  <p class="header-sub">Por Diogo Corrêa · Instrumento cidadão de transparência · Dados públicos das atas da Câmara</p>
+</header>
+
+<div class="container">
+
+  <!-- AÇÕES -->
+  <div class="action-bar">
+    <button class="action-btn btn-share" onclick="copiarLink()">🔗 Copiar Link</button>
+    <button class="action-btn btn-whatsapp" onclick="compartilharWhatsApp()">💬 WhatsApp</button>
+    <button class="action-btn btn-pdf" onclick="baixarPDF()">📄 Baixar PDF</button>
+    <button class="action-btn btn-csv" onclick="exportarCSV()">📊 Exportar CSV</button>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kpi-grid" id="kpi-grid"></div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="ranking">📊 Ranking</button>
+    <button class="tab-btn" data-tab="perfil">👤 Perfil</button>
+    <button class="tab-btn" data-tab="graficos">📈 Gráficos</button>
+    <button class="tab-btn" data-tab="comparativo">⚖️ Comparativo</button>
+    <button class="tab-btn" data-tab="metodologia">📋 Metodologia</button>
+  </div>
+
+  <!-- RANKING -->
+  <div id="ranking" class="tab-content active">
+    <div class="card">
+      <h2><span class="icon">📊</span> Ranking de Atuação</h2>
+      <div class="period-toggle">
+        <button class="active" data-periodo="18m" onclick="setPeriodo('18m', this)">18 meses</button>
+        <button data-periodo="2026" onclick="setPeriodo('2026', this)">2026 em destaque</button>
+      </div>
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="busca" placeholder="Buscar vereador..." oninput="renderRanking()">
+      </div>
+      <div class="filters">
+        <button class="filter-btn active" data-filtro="todos" onclick="filterRanking('todos', this)">Todos</button>
+        <button class="filter-btn" data-filtro="Oposicao" onclick="filterRanking('Oposicao', this)">Oposição</button>
+        <button class="filter-btn" data-filtro="Situacao" onclick="filterRanking('Situacao', this)">Situação</button>
+      </div>
+      <div id="ranking-list"></div>
+    </div>
+  </div>
+
+  <!-- PERFIL -->
+  <div id="perfil" class="tab-content">
+    <div class="card">
+      <h2><span class="icon">👤</span> Perfil do Vereador</h2>
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="busca-perfil" placeholder="Buscar vereador..." oninput="renderPerfilSelector()">
+      </div>
+      <div class="filters" id="perfil-selector"></div>
+      <div id="perfil-detalhe"></div>
+      <div class="chart-container small" id="radar-container" style="margin-top:1.5rem;">
+        <canvas id="radar-chart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- GRÁFICOS -->
+  <div id="graficos" class="tab-content">
+    <div class="card">
+      <h2><span class="icon">📈</span> Pontuação Total por Vereador (18 meses)</h2>
+      <div class="chart-container"><canvas id="chart-ranking"></canvas></div>
+    </div>
+    <div class="chart-grid">
+      <div class="card">
+        <h2><span class="icon">📊</span> Distribuição por Categoria (2025)</h2>
+        <div class="chart-container small"><canvas id="chart-categorias"></canvas></div>
+      </div>
+      <div class="card">
+        <h2><span class="icon">🥧</span> Pontos por Bloco (18 meses)</h2>
+        <div class="chart-container small"><canvas id="chart-bloco"></canvas></div>
+      </div>
+      <div class="card">
+        <h2><span class="icon">⚖️</span> Comparativo 2025 vs 2026</h2>
+        <div class="chart-container small"><canvas id="chart-comparativo"></canvas></div>
+      </div>
+      <div class="card">
+        <h2><span class="icon">📉</span> Evolução da Pontuação (Top 5 + Média)</h2>
+        <div class="chart-container small"><canvas id="chart-evolucao"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMPARATIVO -->
+  <div id="comparativo" class="tab-content">
+    <div class="card">
+      <h2><span class="icon">⚖️</span> Comparativo 2025 vs 1º Semestre 2026</h2>
+      <div style="overflow-x:auto;">
+        <table class="comparison-table">
+          <thead>
+            <tr><th>Vereador</th><th>Partido</th><th>Bloco</th><th>2025</th><th>2026 (1º sem)</th><th>Total 18m</th></tr>
+          </thead>
+          <tbody id="comparison-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- METODOLOGIA -->
+  <div id="metodologia" class="tab-content">
+    <div class="card">
+      <h2><span class="icon">📋</span> Metodologia</h2>
+      <p>Este painel é um instrumento cidadão de transparência, construído a partir de dados públicos das atas da Câmara Municipal de Taquara/RS.</p>
+      <h3 style="margin-top:1rem; color:var(--azul-escuro);">Princípio central</h3>
+      <p style="margin-top:0.5rem;"><strong>Só pontuamos o que o vereador faz por iniciativa própria. Não pontuamos o que lhe é atribuído pela maioria.</strong></p>
+      <h3 style="margin-top:1rem; color:var(--azul-escuro);">Categorias e pesos</h3>
+      <div id="metodologia-categorias" style="overflow-x:auto; margin-top:0.5rem;"></div>
+      <h3 style="margin-top:1rem; color:var(--azul-escuro);">O que ficou de fora</h3>
+      <p style="margin-top:0.5rem;">Comissões permanentes, relatorias, grupos de trabalho e presidência de audiências foram excluídos por serem cargos de indicação política majoritária — não medem atuação individual.</p>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Taquara em Foco · Painel de Atuação Parlamentar · Câmara de Taquara/RS · Dados públicos das atas · Instrumento cidadão de transparência
+</footer>
+
+<script>
+// ===== DADOS =====
+const vereadores = [
+  { nome:"Mônica", partido:"PT", bloco:"Oposicao", foto:"Mnica-Facio.png", total2025:591.5, total2026:81.5, total18m:673, categorias:{"Presença":48,"Indicações/PPs":93,"PIs":10.5,"PDLs":2,"PLs Relevantes":100,"PLs Simbólicas":2,"PELOs":20,"Emendas":136,"Substitutivos":16,"Reuniões":46,"Debates":70,"Req. Audiência":5,"Part. Audiências":14,"Presidir Frente":10,"Membro Frente":10,"Reuniões Frentes":9} },
+  { nome:"Gustavo Luz", partido:"PP", bloco:"Oposicao", foto:"Gustavo-Luz.jpg", total2025:419.5, total2026:119.5, total18m:539, categorias:{"Presença":46,"Indicações/PPs":0,"PIs":10.5,"PDLs":0,"PLs Relevantes":40,"PLs Simbólicas":0,"PELOs":20,"Emendas":200,"Substitutivos":0,"Reuniões":3,"Debates":74,"Req. Audiência":0,"Part. Audiências":16,"Presidir Frente":0,"Membro Frente":10,"Reuniões Frentes":0} },
+  { nome:"Fabi Reinaldo", partido:"Republicanos", bloco:"Oposicao", foto:"Fabi-Reinaldo.png", total2025:319, total2026:148.5, total18m:467.5, categorias:{"Presença":50,"Indicações/PPs":142.5,"PIs":19.5,"PDLs":2,"PLs Relevantes":0,"PLs Simbólicas":0,"PELOs":20,"Emendas":24,"Substitutivos":0,"Reuniões":9,"Debates":23,"Req. Audiência":0,"Part. Audiências":14,"Presidir Frente":0,"Membro Frente":15,"Reuniões Frentes":0} },
+  { nome:"Telmo Vieira", partido:"PP", bloco:"Situacao", foto:"Temo-Vieira.png", total2025:331, total2026:97, total18m:428, categorias:{"Presença":50,"Indicações/PPs":46.5,"PIs":4.5,"PDLs":2,"PLs Relevantes":60,"PLs Simbólicas":12,"PELOs":40,"Emendas":40,"Substitutivos":0,"Reuniões":9,"Debates":23,"Req. Audiência":5,"Part. Audiências":16,"Presidir Frente":10,"Membro Frente":10,"Reuniões Frentes":3} },
+  { nome:"Guido Mario", partido:"PP", bloco:"Situacao", foto:"Guido-Mrio.png", total2025:360, total2026:61.5, total18m:421.5, categorias:{"Presença":48,"Indicações/PPs":42,"PIs":0,"PDLs":2,"PLs Relevantes":40,"PLs Simbólicas":2,"PELOs":20,"Emendas":64,"Substitutivos":0,"Reuniões":17,"Debates":104,"Req. Audiência":0,"Part. Audiências":16,"Presidir Frente":0,"Membro Frente":5,"Reuniões Frentes":0} },
+  { nome:"Jorginho", partido:"Republicanos", bloco:"Situacao", foto:"Jorge.png", total2025:261, total2026:117.5, total18m:378.5, categorias:{"Presença":52,"Indicações/PPs":151.5,"PIs":1.5,"PDLs":2,"PLs Relevantes":0,"PLs Simbólicas":2,"PELOs":20,"Emendas":0,"Substitutivos":0,"Reuniões":3,"Debates":18,"Req. Audiência":0,"Part. Audiências":6,"Presidir Frente":0,"Membro Frente":5,"Reuniões Frentes":0} },
+  { nome:"Everton", partido:"PP", bloco:"Situacao", foto:"Everton.png", total2025:193.5, total2026:62, total18m:255.5, categorias:{"Presença":48,"Indicações/PPs":58.5,"PIs":0,"PDLs":2,"PLs Relevantes":20,"PLs Simbólicas":0,"PELOs":20,"Emendas":0,"Substitutivos":0,"Reuniões":6,"Debates":5,"Req. Audiência":0,"Part. Audiências":24,"Presidir Frente":0,"Membro Frente":10,"Reuniões Frentes":0} },
+  { nome:"Beto Lemos", partido:"PSB", bloco:"Situacao", foto:"Beto-Lemos.png", total2025:186.5, total2026:56, total18m:242.5, categorias:{"Presença":44,"Indicações/PPs":87,"PIs":1.5,"PDLs":2,"PLs Relevantes":0,"PLs Simbólicas":0,"PELOs":0,"Emendas":8,"Substitutivos":0,"Reuniões":11,"Debates":19,"Req. Audiência":0,"Part. Audiências":4,"Presidir Frente":0,"Membro Frente":10,"Reuniões Frentes":0} },
+  { nome:"Magali", partido:"Uniao", bloco:"Oposicao", foto:"Magali.png", total2025:176, total2026:53, total18m:229, categorias:{"Presença":46,"Indicações/PPs":3,"PIs":3,"PDLs":2,"PLs Relevantes":40,"PLs Simbólicas":0,"PELOs":20,"Emendas":16,"Substitutivos":0,"Reuniões":9,"Debates":28,"Req. Audiência":0,"Part. Audiências":4,"Presidir Frente":0,"Membro Frente":5,"Reuniões Frentes":0} },
+  { nome:"Elias da Enfermagem", partido:"Republicanos", bloco:"Situacao", foto:"elias-da-Enfermagem.png", total2025:179, total2026:49, total18m:228, categorias:{"Presença":52,"Indicações/PPs":94.5,"PIs":1.5,"PDLs":0,"PLs Relevantes":20,"PLs Simbólicas":2,"PELOs":0,"Emendas":0,"Substitutivos":0,"Reuniões":3,"Debates":6,"Req. Audiência":0,"Part. Audiências":0,"Presidir Frente":0,"Membro Frente":0,"Reuniões Frentes":0} },
+  { nome:"Dodô Mello", partido:"Republicanos", bloco:"Situacao", foto:"Dod-Melo.png", total2025:152.5, total2026:50, total18m:202.5, categorias:{"Presença":52,"Indicações/PPs":42,"PIs":1.5,"PDLs":2,"PLs Relevantes":0,"PLs Simbólicas":0,"PELOs":20,"Emendas":8,"Substitutivos":0,"Reuniões":6,"Debates":0,"Req. Audiência":0,"Part. Audiências":16,"Presidir Frente":0,"Membro Frente":5,"Reuniões Frentes":0} },
+  { nome:"Lissandro", partido:"MDB", bloco:"Situacao", foto:"Lisandro-Neni.png", total2025:145, total2026:48.5, total18m:193.5, categorias:{"Presença":50,"Indicações/PPs":36,"PIs":3,"PDLs":2,"PLs Relevantes":20,"PLs Simbólicas":0,"PELOs":20,"Emendas":0,"Substitutivos":0,"Reuniões":3,"Debates":0,"Req. Audiência":0,"Part. Audiências":6,"Presidir Frente":0,"Membro Frente":5,"Reuniões Frentes":0} },
+  { nome:"Carmem Fontoura", partido:"PSB", bloco:"Situacao", foto:"Carmem-Fontoura.png", total2025:121, total2026:64, total18m:185, categorias:{"Presença":50,"Indicações/PPs":6,"PIs":0,"PDLs":2,"PLs Relevantes":0,"PLs Simbólicas":0,"PELOs":20,"Emendas":0,"Substitutivos":0,"Reuniões":9,"Debates":18,"Req. Audiência":0,"Part. Audiências":6,"Presidir Frente":0,"Membro Frente":10,"Reuniões Frentes":0} },
+  { nome:"Jaimara", partido:"PL", bloco:"Situacao", foto:"Jaimara.png", total2025:139, total2026:36, total18m:175, categorias:{"Presença":32,"Indicações/PPs":12,"PIs":0,"PDLs":2,"PLs Relevantes":20,"PLs Simbólicas":0,"PELOs":40,"Emendas":0,"Substitutivos":0,"Reuniões":11,"Debates":13,"Req. Audiência":0,"Part. Audiências":4,"Presidir Frente":0,"Membro Frente":5,"Reuniões Frentes":0} },
+  { nome:"Enf. Jorge Amaral", partido:"PDT", bloco:"Situacao", foto:"Jorge-Amaral.jpeg", total2025:59, total2026:63, total18m:122, categorias:{"Presença":52,"Indicações/PPs":0,"PIs":0,"PDLs":2,"PLs Relevantes":0,"PLs Simbólicas":0,"PELOs":0,"Emendas":0,"Substitutivos":0,"Reuniões":0,"Debates":0,"Req. Audiência":0,"Part. Audiências":0,"Presidir Frente":0,"Membro Frente":5,"Reuniões Frentes":0} },
+  { nome:"Junior Eltz", partido:"PDT", bloco:"Situacao", foto:"", total2025:69, total2026:0, total18m:69, categorias:{"Presença":0,"Indicações/PPs":36,"PIs":0,"PDLs":0,"PLs Relevantes":20,"PLs Simbólicas":0,"PELOs":0,"Emendas":0,"Substitutivos":0,"Reuniões":3,"Debates":8,"Req. Audiência":0,"Part. Audiências":2,"Presidir Frente":0,"Membro Frente":0,"Reuniões Frentes":0} },
+  { nome:"Sirlene Kaiper", partido:"PP", bloco:"Situacao", foto:"", total2025:32, total2026:0, total18m:32, categorias:{"Presença":0,"Indicações/PPs":12,"PIs":0,"PDLs":0,"PLs Relevantes":20,"PLs Simbólicas":0,"PELOs":0,"Emendas":0,"Substitutivos":0,"Reuniões":0,"Debates":0,"Req. Audiência":0,"Part. Audiências":0,"Presidir Frente":0,"Membro Frente":0,"Reuniões Frentes":0} },
+  { nome:"Pedrinho Teixeira", partido:"PT", bloco:"Situacao", foto:"", total2025:21.5, total2026:0, total18m:21.5, categorias:{"Presença":0,"Indicações/PPs":7.5,"PIs":0,"PDLs":0,"PLs Relevantes":0,"PLs Simbólicas":2,"PELOs":0,"Emendas":8,"Substitutivos":0,"Reuniões":0,"Debates":2,"Req. Audiência":0,"Part. Audiências":2,"Presidir Frente":0,"Membro Frente":0,"Reuniões Frentes":0} },
+  { nome:"Adalberto Soares", partido:"PP", bloco:"Situacao", foto:"", total2025:12, total2026:0, total18m:12, categorias:{"Presença":0,"Indicações/PPs":9,"PIs":0,"PDLs":0,"PLs Relevantes":0,"PLs Simbólicas":0,"PELOs":0,"Emendas":0,"Substitutivos":0,"Reuniões":3,"Debates":0,"Req. Audiência":0,"Part. Audiências":0,"Presidir Frente":0,"Membro Frente":0,"Reuniões Frentes":0} }
+];
+
+// ===== ESTADO =====
+let filtroAtual = 'todos';
+let periodoAtual = '18m';
+let perfilAtivo = vereadores[0].nome;
+let radarChart = null;
+let charts = {};
+
+// ===== KPIs =====
+function renderKPIs() {
+  const total = vereadores.reduce((s,v)=>s+v.total18m,0);
+  const media = (total/vereadores.length).toFixed(1);
+  const max = vereadores[0].total18m;
+  const min = vereadores[vereadores.length-1].total18m;
+  document.getElementById('kpi-grid').innerHTML = `
+    <div class="kpi-card"><div class="kpi-icon">👥</div><div class="kpi-value">${vereadores.length}</div><div class="kpi-label">Vereadores</div></div>
+    <div class="kpi-card"><div class="kpi-icon">🏆</div><div class="kpi-value">${total}</div><div class="kpi-label">Total de Pontos</div></div>
+    <div class="kpi-card"><div class="kpi-icon">📊</div><div class="kpi-value">${media}</div><div class="kpi-label">Média Geral</div></div>
+    <div class="kpi-card destaque"><div class="kpi-icon">🥇</div><div class="kpi-value">${max}</div><div class="kpi-label">Maior Pontuação</div></div>
+    <div class="kpi-card"><div class="kpi-icon">📉</div><div class="kpi-value">${min}</div><div class="kpi-label">Menor Pontuação</div></div>
+  `;
+}
+
+// ===== RANKING =====
+function getValorPeriodo(v) {
+  return periodoAtual === '2026' ? v.total2026 : v.total18m;
+}
+
+function renderRanking() {
+  const busca = (document.getElementById('busca').value||'').toLowerCase();
+  const lista = document.getElementById('ranking-list');
+  const ordenados = [...vereadores].sort((a,b)=>getValorPeriodo(b)-getValorPeriodo(a));
+  const filtrados = ordenados.filter(v =>
+    (filtroAtual==='todos' || v.bloco===filtroAtual) &&
+    (!busca || v.nome.toLowerCase().includes(busca) || v.partido.toLowerCase().includes(busca))
+  );
+  lista.innerHTML = filtrados.map((v,i)=>{
+    const pos = i+1;
+    const posClass = pos===1?'pos-1':pos===2?'pos-2':pos===3?'pos-3':'pos-outro';
+    const medalha = pos===1?'🥇':pos===2?'🥈':pos===3?'🥉':'';
+    const foto = v.foto
+      ? `<img class="foto" src="${v.foto}" alt="${v.nome}" onerror="this.style.display='none'">`
+      : `<div class="foto" style="display:flex;align-items:center;justify-content:center;background:var(--azul-ardosia);color:white;font-weight:700;font-size:1.2rem;">${v.nome.charAt(0)}</div>`;
+    return `
+      <div class="ranking-item" onclick="showProfile('${v.nome}')">
+        <div class="posicao ${posClass}">${pos}</div>
+        ${foto}
+        <div class="info">
+          <div class="nome">${v.nome} ${medalha}</div>
+          <div class="partido">${v.partido} · ${v.bloco==='Oposicao'?'Oposição':'Situação'}</div>
+        </div>
+        <div class="pontos">${getValorPeriodo(v)} pts</div>
+      </div>`;
+  }).join('');
+  if(!filtrados.length) lista.innerHTML = '<p style="text-align:center;color:var(--cinza-medio);padding:1rem;">Nenhum vereador encontrado.</p>';
+}
+
+function setPeriodo(p, btn) {
+  periodoAtual = p;
+  document.querySelectorAll('.period-toggle button').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  renderRanking();
+}
+
+function filterRanking(filtro, btn) {
+  filtroAtual = filtro;
+  document.querySelectorAll('.filter-btn[data-filtro]').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  renderRanking();
+}
+
+// ===== PERFIL =====
+function renderPerfilSelector() {
+  const busca = (document.getElementById('busca-perfil').value||'').toLowerCase();
+  const sel = document.getElementById('perfil-selector');
+  const filtrados = vereadores.filter(v=>!busca || v.nome.toLowerCase().includes(busca));
+  sel.innerHTML = filtrados.map(v=>
+    `<button class="filter-btn ${v.nome===perfilAtivo?'active':''}" onclick="renderPerfilDetalhe('${v.nome}')">${v.nome}</button>`
+  ).join('');
+}
+
+function renderPerfilDetalhe(nome) {
+  perfilAtivo = nome;
+  renderPerfilSelector();
+  const v = vereadores.find(x=>x.nome===nome);
+  if(!v) return;
+  const pos = vereadores.indexOf(v)+1;
+  const medalha = pos===1?'🥇':pos===2?'🥈':pos===3?'🥉':'';
+  const pct = ((v.total18m/vereadores[0].total18m)*100).toFixed(1);
+  const badgeClass = pos<=3?'top':pos<=7?'mid':'low';
+  const badgeText = pos<=3?'Top 3':pos<=7?'Destaque':'Regular';
+  const foto = v.foto
+    ? `<img class="profile-foto" src="${v.foto}" alt="${v.nome}" onerror="this.style.display='none'">`
+    : `<div class="profile-foto" style="display:flex;align-items:center;justify-content:center;background:var(--azul-ardosia);color:white;font-size:3rem;font-weight:700;">${v.nome.charAt(0)}</div>`;
+  const categorias = Object.entries(v.categorias).map(([label,valor])=>
+    `<div class="categoria-item"><div class="valor">${valor}</div><div class="label">${label}</div></div>`
+  ).join('');
+  document.getElementById('perfil-detalhe').innerHTML = `
+    <div class="profile-header">
+      ${foto}
+      <div class="profile-info">
+        <h2>${v.nome} ${medalha}</h2>
+        <div class="partido">${v.partido} · ${v.bloco==='Oposicao'?'Oposição':'Situação'}</div>
+        <div class="total">${v.total18m} pontos</div>
+        <div class="sub">2025: ${v.total2025} pts · 2026 (1º sem): ${v.total2026} pts</div>
+        <div class="sub">${pct}% da pontuação do líder</div>
+        <span class="badge-pos ${badgeClass}">${pos}º lugar · ${badgeText}</span>
+      </div>
+    </div>
+    <h3 style="color:var(--azul-escuro);margin-bottom:0.5rem;">Detalhamento por categoria (2025)</h3>
+    <div class="categoria-grid">${categorias}</div>
+  `;
+  renderRadar(v);
+}
+
+function renderRadar(v) {
+  const labels = Object.keys(v.categorias);
+  const data = Object.values(v.categorias);
+  if(radarChart) radarChart.destroy();
+  const ctx = document.getElementById('radar-chart').getContext('2d');
+  radarChart = new Chart(ctx, {
+    type:'radar',
+    data:{ labels, datasets:[{
+      label:v.nome, data, borderColor:'#5B7A9D', backgroundColor:'rgba(91,122,157,0.15)',
+      pointBackgroundColor:'#16233C', borderWidth:2
+    }]},
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      scales:{ r:{ beginAtZero:true, ticks:{stepSize:50} } },
+      plugins:{ legend:{display:false} }
+    }
+  });
+}
+
+// ===== COMPARATIVO =====
+function renderComparativo() {
+  document.getElementById('comparison-body').innerHTML = vereadores.map(v=>`
+    <tr>
+      <td>${v.nome}</td><td>${v.partido}</td>
+      <td>${v.bloco==='Oposicao'?'Oposição':'Situação'}</td>
+      <td>${v.total2025}</td><td>${v.total2026}</td>
+      <td><strong>${v.total18m}</strong></td>
+    </tr>`).join('');
+}
+
+// ===== GRÁFICOS =====
+function renderGraficos() {
+  const ordenados = [...vereadores].sort((a,b)=>b.total18m-a.total18m);
+
+  // Ranking 18 meses
+  const ctx1 = document.getElementById('chart-ranking').getContext('2d');
+  if(charts.ranking) charts.ranking.destroy();
+  charts.ranking = new Chart(ctx1, {
+    type:'bar',
+    data:{ labels:ordenados.map(v=>v.nome), datasets:[{
+      label:'Pontos (18 meses)', data:ordenados.map(v=>v.total18m),
+      backgroundColor:ordenados.map((v,i)=>i===0?'#16233C':i===1?'#5B7A9D':i===2?'#9CA3AF':'#7A96B8'),
+      borderRadius:6
+    }]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{callbacks:{label:(c)=>c.parsed.y+' pts'}} },
+      scales:{ y:{beginAtZero:true} }
+    }
+  });
+
+  // Categorias (soma)
+  const cats = ["Presença","Indicações/PPs","PIs","PDLs","PLs Relevantes","PLs Simbólicas","PELOs","Emendas","Substitutivos","Reuniões","Debates","Req. Audiência","Part. Audiências","Presidir Frente","Membro Frente","Reuniões Frentes"];
+  const somaCat = cats.map(c=>vereadores.reduce((s,v)=>s+(v.categorias[c]||0),0));
+  const ctx2 = document.getElementById('chart-categorias').getContext('2d');
+  if(charts.categorias) charts.categorias.destroy();
+  charts.categorias = new Chart(ctx2, {
+    type:'bar',
+    data:{ labels:cats, datasets:[{ label:'Total de pontos', data:somaCat, backgroundColor:'#5B7A9D', borderRadius:4 }]},
+    options:{ responsive:true, maintainAspectRatio:false, indexAxis:'y',
+      plugins:{ legend:{display:false} }, scales:{ x:{beginAtZero:true} }
+    }
+  });
+
+  // Pizza por bloco
+  const somaOpos = vereadores.filter(v=>v.bloco==='Oposicao').reduce((s,v)=>s+v.total18m,0);
+  const somaSit = vereadores.filter(v=>v.bloco==='Situacao').reduce((s,v)=>s+v.total18m,0);
+  const ctx3 = document.getElementById('chart-bloco').getContext('2d');
+  if(charts.bloco) charts.bloco.destroy();
+  charts.bloco = new Chart(ctx3, {
+    type:'pie',
+    data:{ labels:['Oposição','Situação'], datasets:[{
+      data:[somaOpos, somaSit],
+      backgroundColor:['#16233C','#7A96B8'],
+      borderColor:'#FFFFFF', borderWidth:2
+    }]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{position:'bottom'}, tooltip:{callbacks:{label:(c)=>` ${c.label}: ${c.parsed} pts (${((c.parsed/(somaOpos+somaSit))*100).toFixed(1)}%)`}} }
+    }
+  });
+
+  // Comparativo
+  const ctx4 = document.getElementById('chart-comparativo').getContext('2d');
+  if(charts.comparativo) charts.comparativo.destroy();
+  charts.comparativo = new Chart(ctx4, {
+    type:'bar',
+    data:{ labels:ordenados.map(v=>v.nome), datasets:[
+      { label:'2025', data:ordenados.map(v=>v.total2025), backgroundColor:'#16233C', borderRadius:4 },
+      { label:'2026 (1º sem)', data:ordenados.map(v=>v.total2026), backgroundColor:'#7A96B8', borderRadius:4 }
+    ]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{position:'top'} }, scales:{ y:{beginAtZero:true} }
+    }
+  });
+
+  // Evolução (Top 5 + média)
+  const top5 = ordenados.slice(0,5);
+  const media2025 = (vereadores.reduce((s,v)=>s+v.total2025,0)/vereadores.length).toFixed(1);
+  const media2026 = (vereadores.reduce((s,v)=>s+v.total2026,0)/vereadores.length).toFixed(1);
+  const cores = ['#16233C','#5B7A9D','#9CA3AF','#7A96B8','#D3D3D3'];
+  const ctx5 = document.getElementById('chart-evolucao').getContext('2d');
+  if(charts.evolucao) charts.evolucao.destroy();
+  charts.evolucao = new Chart(ctx5, {
+    type:'line',
+    data:{ labels:['2025','2026 (1º sem)'], datasets:[
+      ...top5.map((v,i)=>({ label:v.nome, data:[v.total2025,v.total2026], borderColor:cores[i], backgroundColor:cores[i], tension:0.3, pointRadius:5 })),
+      { label:'Média geral', data:[media2025,media2026], borderColor:'#dc2626', backgroundColor:'#dc2626', borderDash:[6,4], tension:0.3, pointRadius:5 }
+    ]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{position:'bottom'} }, scales:{ y:{beginAtZero:true} }
+    }
+  });
+}
+
+// ===== METODOLOGIA =====
+function renderMetodologia() {
+  const cats = [
+    ["Presença em Sessões","+2 por sessão","Por evento"],
+    ["PL Relevante","+20 por projeto","Por autoria"],
+    ["Lei Simbólica","+2 por projeto","Por autoria"],
+    ["Pedido de Informação","+1,5 por pedido","Por autoria"],
+    ["Pedido de Providência / Indicação","+1,5 por pedido","Por autoria"],
+    ["Emenda","+8 por emenda","Por autoria"],
+    ["Substitutivo","+8 por substitutivo","Por autoria"],
+    ["Requerimento de Audiência Pública","+5 por requerimento","Por autoria"],
+    ["Participação em Audiência Pública","+2 por evento","Por presença"],
+    ["Debates na Ordem do Dia","+1 por projeto","Por manifestação"],
+    ["Presidir Frente Parlamentar","+10","Evento único"],
+    ["Ser Membro de Frente","+5","Evento único"],
+    ["Participação em Reuniões de Frentes","+3 por reunião","Por evento"],
+    ["PDL","+2 por projeto","Por autoria"]
+  ];
+  document.getElementById('metodologia-categorias').innerHTML = `
+    <table class="comparison-table">
+      <thead><tr><th>Categoria</th><th>Peso</th><th>Natureza</th></tr></thead>
+      <tbody>${cats.map(c=>`<tr><td>${c[0]}</td><td>${c[1]}</td><td>${c[2]}</td></tr>`).join('')}</tbody>
+    </table>`;
+}
+
+// ===== TABS (corrigido: sem event.target) =====
+function showTab(tabId) {
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+  const btn = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
+  if(btn) btn.classList.add('active');
+  if(tabId==='graficos') renderGraficos();
+  if(tabId==='comparativo') renderComparativo();
+  if(tabId==='metodologia') renderMetodologia();
+  if(tabId==='perfil') renderPerfilDetalhe(perfilAtivo);
+}
+
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>showTab(btn.dataset.tab));
+});
+
+// ===== PERFIL via ranking =====
+function showProfile(nome) {
+  perfilAtivo = nome;
+  showTab('perfil');
+  renderPerfilDetalhe(nome);
+}
+
+// ===== COMPARTILHAR =====
+function copiarLink() {
+  const url = window.location.href;
+  navigator.clipboard.writeText(url).then(()=>{
+    alert('Link copiado!');
+  }).catch(()=>alert('Não foi possível copiar. Copie manualmente: '+url));
+}
+function compartilharWhatsApp() {
+  const texto = encodeURIComponent('Confira o Painel de Atuação Parlamentar da Câmara de Taquara (2025/2026) — Taquara em Foco: '+window.location.href);
+  window.open('https://wa.me/?text='+texto,'_blank');
+}
+function baixarPDF() {
+  window.print();
+}
+function exportarCSV() {
+  const headers = ['Vereador','Partido','Bloco','2025','2026 (1º sem)','Total 18m'];
+  const linhas = vereadores.map(v=>[v.nome,v.partido,v.bloco,v.total2025,v.total2026,v.total18m]);
+  const csv = [headers,...linhas].map(r=>r.join(';')).join('\n');
+  const blob = new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'ranking-atuacao-parlamentar-taquara.csv';
+  a.click();
+}
+
+// ===== INIT =====
+renderKPIs();
+renderRanking();
+renderComparativo();
+renderPerfilSelector();
+renderPerfilDetalhe(perfilAtivo);
+</script>
+</body>
+</html>

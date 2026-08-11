@@ -691,17 +691,6 @@
 
 <div class="container">
 
-  <!-- AÇÕES -->
-  <div class="action-bar">
-    <button class="action-btn btn-share" onclick="copiarLink()">🔗 Copiar Link</button>
-    <button class="action-btn btn-whatsapp" onclick="compartilharWhatsApp()">💬 WhatsApp</button>
-    <button class="action-btn btn-pdf" onclick="baixarPDF()">📄 Baixar PDF</button>
-    <button class="action-btn btn-csv" onclick="exportarCSV()">📊 Exportar CSV</button>
-  </div>
-
-  <!-- KPIs -->
-  <div class="kpi-grid" id="kpi-grid"></div>
-
   <!-- TABS -->
   <div class="tabs">
     <button class="tab-btn active" data-tab="ranking">📊 Ranking</button>
@@ -710,7 +699,6 @@
     <button class="tab-btn" data-tab="comparativo">⚖️ Comparativo</button>
     <button class="tab-btn" data-tab="metodologia">📋 Metodologia</button>
   </div>
-
   <!-- RANKING -->
   <div id="ranking" class="tab-content active">
     <div class="card">
@@ -733,7 +721,16 @@
 <div id="ranking-list"></div>
     </div>
   </div>
+  <!-- AÇÕES -->
+<div class="action-bar">
+    <button class="action-btn btn-share" onclick="copiarLink()">🔗 Copiar Link</button>
+    <button class="action-btn btn-whatsapp" onclick="compartilharWhatsApp()">💬 WhatsApp</button>
+    <button class="action-btn btn-pdf" onclick="baixarPDF()">📄 Baixar PDF</button>
+    <button class="action-btn btn-csv" onclick="exportarCSV()">📊 Exportar CSV</button>
+  </div>
 
+  <!-- KPIs -->
+  <div class="kpi-grid" id="kpi-grid"></div>
   <!-- PERFIL -->
   <div id="perfil" class="tab-content">
     <div class="card">
